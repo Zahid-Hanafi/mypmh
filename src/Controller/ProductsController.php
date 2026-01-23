@@ -6,6 +6,11 @@ namespace App\Controller;
 class ProductsController extends AppController
 {
     /**
+     * @var \App\Model\Table\OrdersTable
+     */
+    public $Orders = null;
+
+    /**
      * listmerchandise method
      * Fetches products and specific order history for the current user.
      */

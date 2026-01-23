@@ -14,12 +14,14 @@ use Cake\Http\MiddlewareQueue;
 use Cake\ORM\Locator\TableLocator;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
+use DebugKit\Middleware\DebugKitMiddleware;
 
 // Auth Namespaces
 use Authentication\AuthenticationService;
 use Authentication\AuthenticationServiceInterface;
 use Authentication\AuthenticationServiceProviderInterface;
 use Authentication\Middleware\AuthenticationMiddleware;
+use Cake\Routing\RouteBuilder;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Application extends BaseApplication implements AuthenticationServiceProviderInterface
@@ -31,7 +33,11 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             FactoryLocator::add('Table', (new TableLocator())->allowFallbackClass(false));
         }
         $this->addPlugin('Authentication');
-        $this->addPlugin('DebugKit');
+        // DebugKit disabled due to routing conflicts with Authentication plugin
+        // Uncomment when the issue is resolved
+        // if (Configure::read('debug')) {
+        //     $this->addPlugin('DebugKit', ['bootstrap' => true, 'routes' => true, 'middleware' => false]);
+        // }
     }
 
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
@@ -41,12 +47,13 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             ->add(new AssetMiddleware())
             ->add(new RoutingMiddleware($this))
             ->add(new BodyParserMiddleware())
-            ->add(new AuthenticationMiddleware($this))
-            ->add(function ($request, $handler) {
+            ->add(new AuthenticationMiddleware($this));
+
+        $middlewareQueue->add(function ($request, $handler) {
                 $controller = $request->getParam('controller');
                 $action = $request->getParam('action');
                 
-                // KEMASKINI: Kecualikan CSRF untuk Login, Register, DAN aksi Admin Programs
+
                 $bypassActions = [
                     'Users' => ['login', 'register'],
                     'Programs' => ['add', 'edit', 'delete']
@@ -55,8 +62,13 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
                 if (isset($bypassActions[$controller]) && in_array($action, $bypassActions[$controller])) {
                     return $handler->handle($request);
                 }
+
+                // Kecualikan DebugKit dari CSRF
+                if (strpos($request->getUri()->getPath(), '/debug-kit') !== false) {
+                    return $handler->handle($request);
+                }
                 
-                // Gunakan tetapan kuki yang lebih longgar untuk local development
+         
                 $csrf = new CsrfProtectionMiddleware([
                     'httponly' => true,
                     'checkNoCache' => false,
