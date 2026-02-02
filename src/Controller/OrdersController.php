@@ -80,6 +80,13 @@ class OrdersController extends AppController
 
     public function totalorder()
     {
+        // Admin-only access control
+        $identity = $this->Authentication->getIdentity();
+        if (!$identity || $identity->get('role') !== 'admin') {
+            $this->Flash->error(__('Access denied. This page is for administrators only.'));
+            return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'dashboard']);
+        }
+        
         $orders = $this->Orders->find()->contain(['Users', 'Products'])->order(['Orders.id' => 'DESC'])->all();
         $this->set(compact('orders'));
     }

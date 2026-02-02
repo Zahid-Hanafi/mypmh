@@ -27,6 +27,21 @@ class UsersController extends AppController
         $result = $this->Authentication->getResult();
 
         if ($result->isValid()) {
+            // Get the authenticated user's identity
+            $identity = $this->Authentication->getIdentity();
+            $selectedRole = $this->request->getData('role');
+            
+            // Validate that selected role matches user's actual role
+            if ($identity->get('role') !== $selectedRole) {
+                $this->Authentication->logout();
+                if ($selectedRole === 'admin') {
+                    $this->Flash->error(__('Access denied. You are not registered as an Admin. Please select Student.'));
+                } else {
+                    $this->Flash->error(__('Access denied. You are not registered as a Student. Please select Admin.'));
+                }
+                return null;
+            }
+            
             return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'dashboard']);
         }
 
@@ -57,5 +72,25 @@ class UsersController extends AppController
     {
         $this->Authentication->logout();
         return $this->redirect(['action' => 'login']);
+    }
+
+    public function profile()
+    {
+        $identity = $this->Authentication->getIdentity();
+        $user = $this->Users->get($identity->get('id'));
+        
+        if ($this->request->is(['post', 'put'])) {
+            $user = $this->Users->patchEntity($user, $this->request->getData(), [
+                'fields' => ['full_name', 'email', 'phone_no']
+            ]);
+            
+            if ($this->Users->save($user)) {
+                $this->Flash->success(__('Profile updated successfully!'));
+                return $this->redirect(['action' => 'profile']);
+            }
+            $this->Flash->error(__('Could not update profile. Please try again.'));
+        }
+        
+        $this->set(compact('user'));
     }
 }

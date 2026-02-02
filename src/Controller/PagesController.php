@@ -32,7 +32,53 @@ class PagesController extends AppController
             $totalOrders = $ordersTable->find()->count();
             $totalProducts = $productsTable->find()->count();
 
-            $this->set(compact('totalPrograms', 'upcomingPrograms', 'totalOrders', 'totalProducts'));
+            // Monthly program data for 2025 (for bar chart)
+            $monthlyPrograms = [];
+            for ($month = 1; $month <= 12; $month++) {
+                $count = $programsTable->find()
+                    ->where([
+                        'YEAR(date)' => 2025,
+                        'MONTH(date)' => $month
+                    ])->count();
+                $monthlyPrograms[] = $count;
+            }
+
+            // Orders by product category (for pie chart)
+            $ordersByCategory = [];
+            $categoryLabels = [];
+            $categoryData = [];
+            
+            $categoryResults = $ordersTable->find()
+                ->select([
+                    'category' => 'Products.category',
+                    'count' => $ordersTable->find()->func()->count('Orders.id')
+                ])
+                ->contain(['Products'])
+                ->group(['Products.category'])
+                ->toArray();
+            
+            foreach ($categoryResults as $result) {
+                $categoryLabels[] = $result->category;
+                $categoryData[] = (int)$result->count;
+            }
+
+            // Upcoming programs for slideshow
+            $upcomingProgramsList = $programsTable->find()
+                ->where(['status' => 'upcoming'])
+                ->order(['date' => 'ASC'])
+                ->limit(5)
+                ->toArray();
+
+            $this->set(compact(
+                'totalPrograms', 
+                'upcomingPrograms', 
+                'totalOrders', 
+                'totalProducts', 
+                'monthlyPrograms',
+                'categoryLabels',
+                'categoryData',
+                'upcomingProgramsList'
+            ));
         }
 
         try {

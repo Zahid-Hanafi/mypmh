@@ -1,129 +1,237 @@
 <?php
 /**
- * MyPMH Dashboard
- * Includes Chart.js and Tailwind CSS
+ * MyPMH Dashboard - Enhanced UI
  */
+$totalPrograms = $totalPrograms ?? 0;
+$upcomingPrograms = $upcomingPrograms ?? 0;
+$totalOrders = $totalOrders ?? 0;
+$monthlyPrograms = $monthlyPrograms ?? [0,0,0,0,0,0,0,0,0,0,0,0];
+$categoryLabels = $categoryLabels ?? [];
+$categoryData = $categoryData ?? [];
+$upcomingProgramsList = $upcomingProgramsList ?? [];
 ?>
-<div class="bg-pmh-yellow text-pmh-purple py-3 font-bold shadow-md mb-10 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] -mt-8">
-    <marquee scrollamount="10" class="flex items-center">
-        🔥 PROMOTION: New RAVEN Edition T-shirts are now available! Get yours today! | 
-        📢 UPCOMING: Hadhari Global Volunteers Program - Registration opens next week! | 
-        🛍️ PRE-ORDER: Exclusive MyPMH Tote Bags back in stock!
-    </marquee>
-</div>
 
-<div class="relative w-full h-64 md:h-96 bg-gray-200 rounded-2xl overflow-hidden mb-8 shadow-lg group">
-    <div class="absolute inset-0 transition-opacity duration-1000 opacity-100 bg-pmh-purple flex items-center justify-center text-white p-10">
-        <div class="text-center">
-            <h2 class="text-4xl font-extrabold mb-4">Upcoming: Hadhari Night 2025</h2>
-            <p class="text-xl text-pmh-yellow">Date: 15th February 2025 | Venue: Kolej Jasmine</p>
-            <button class="mt-6 px-6 py-2 bg-pmh-yellow text-pmh-purple font-bold rounded-full hover:bg-white transition-colors">Learn More</button>
-        </div>
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+    <div>
+        <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p class="text-gray-500 mt-1">Welcome back! Here's what's happening with MyPMH.</p>
     </div>
-    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-        <div class="w-3 h-3 bg-white rounded-full"></div>
-        <div class="w-3 h-3 bg-white/50 rounded-full"></div>
-        <div class="w-3 h-3 bg-white/50 rounded-full"></div>
+    <div class="flex gap-3">
+        <a href="<?= $this->Url->build(['controller' => 'Programs', 'action' => 'allprogram']) ?>" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-xl font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all">
+            <i class="fas fa-calendar-alt text-pmh-purple"></i> 
+            <span class="hidden sm:inline">View Programs</span>
+        </a>
+        <a href="<?= $this->Url->build(['controller' => 'Products', 'action' => 'listmerchandise']) ?>" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-pmh-purple to-pmh-purple-dark text-white rounded-xl font-medium hover:shadow-lg hover:shadow-purple-200 transition-all">
+            <i class="fas fa-shopping-bag"></i> 
+            <span class="hidden sm:inline">Shop Now</span>
+        </a>
     </div>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-white p-6 rounded-2xl border-l-8 border-pmh-purple shadow-md hover:shadow-xl transition-shadow">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm font-bold text-gray-500 uppercase">Total Programs</p>
-                <h3 class="text-3xl font-black text-pmh-purple mt-1" id="stat-total-programs">20</h3>
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+    <!-- Total Programs -->
+    <div class="group bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:border-pmh-purple/20 transition-all relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-pmh-purple/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
+        <div class="relative">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-pmh-purple to-pmh-purple-dark rounded-xl flex items-center justify-center shadow-lg shadow-purple-200">
+                    <i class="fas fa-calendar-check text-white text-lg"></i>
+                </div>
+                <span class="text-xs font-medium text-gray-400 bg-gray-50 px-2 py-1 rounded-lg">All time</span>
             </div>
-            <i class="fas fa-calendar-check text-4xl text-gray-200"></i>
+            <p class="text-sm font-medium text-gray-500">Total Programs</p>
+            <p class="text-3xl font-bold text-gray-900 mt-1"><?= $totalPrograms ?></p>
         </div>
     </div>
-    <div class="bg-white p-6 rounded-2xl border-l-8 border-pmh-yellow shadow-md hover:shadow-xl transition-shadow">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm font-bold text-gray-500 uppercase">Upcoming Events</p>
-                <h3 class="text-3xl font-black text-pmh-purple mt-1">4</h3>
+
+    <!-- Upcoming -->
+    <div class="group bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:border-pmh-yellow/20 transition-all relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-pmh-yellow/20 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
+        <div class="relative">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-pmh-yellow to-yellow-400 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-200">
+                    <i class="fas fa-clock text-pmh-purple text-lg"></i>
+                </div>
+                <span class="text-xs font-medium text-pmh-yellow bg-yellow-50 px-2 py-1 rounded-lg">Active</span>
             </div>
-            <i class="fas fa-clock text-4xl text-gray-200"></i>
+            <p class="text-sm font-medium text-gray-500">Upcoming Events</p>
+            <p class="text-3xl font-bold text-gray-900 mt-1"><?= $upcomingPrograms ?></p>
         </div>
     </div>
-    <div class="bg-white p-6 rounded-2xl border-l-8 border-black shadow-md hover:shadow-xl transition-shadow">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm font-bold text-gray-500 uppercase">Total Orders</p>
-                <h3 class="text-3xl font-black text-pmh-purple mt-1" id="stat-total-orders">30</h3>
+
+    <!-- Total Orders -->
+    <div class="group bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:border-gray-300 transition-all relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-gray-200/50 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
+        <div class="relative">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-gray-800 to-black rounded-xl flex items-center justify-center shadow-lg shadow-gray-300">
+                    <i class="fas fa-shopping-cart text-white text-lg"></i>
+                </div>
+                <span class="text-xs font-medium text-gray-400 bg-gray-50 px-2 py-1 rounded-lg">Orders</span>
             </div>
-            <i class="fas fa-shopping-cart text-4xl text-gray-200"></i>
+            <p class="text-sm font-medium text-gray-500">Total Orders</p>
+            <p class="text-3xl font-bold text-gray-900 mt-1"><?= $totalOrders ?></p>
+        </div>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="group bg-gradient-to-br from-pmh-purple to-pmh-purple-dark rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <div class="relative text-white">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-pmh-yellow rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-user text-pmh-purple text-lg"></i>
+                </div>
+            </div>
+            <p class="text-sm font-medium text-purple-200">My Account</p>
+            <p class="text-lg font-bold mt-1">View Profile</p>
+            <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'profile']) ?>" class="absolute inset-0"></a>
         </div>
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-    <div class="bg-white p-6 rounded-2xl shadow-md">
-        <h4 class="text-lg font-bold text-pmh-purple mb-4 flex items-center gap-2">
-            <i class="fas fa-chart-bar"></i> Monthly Program Distribution 2025
-        </h4>
-        <div class="h-64">
-            <canvas id="programChart"></canvas>
-        </div>
+<!-- Featured Banner -->
+<?php if (!empty($upcomingProgramsList)): ?>
+<div class="bg-gradient-to-r from-pmh-purple via-pmh-purple-dark to-pmh-purple rounded-2xl p-6 lg:p-10 mb-8 relative overflow-hidden">
+    <!-- Decorative -->
+    <div class="absolute top-0 right-0 w-64 h-64 bg-pmh-yellow opacity-10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+    <div class="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+    <div class="absolute right-10 bottom-0 opacity-10">
+        <i class="fas fa-calendar-alt text-[150px] text-white"></i>
     </div>
-    <div class="bg-white p-6 rounded-2xl shadow-md">
-        <h4 class="text-lg font-bold text-pmh-purple mb-4 flex items-center gap-2">
-            <i class="fas fa-chart-pie"></i> Orders by Product Category
-        </h4>
-        <div class="h-64 flex justify-center">
-            <canvas id="orderChart"></canvas>
+    
+    <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <div class="text-white">
+            <span class="inline-flex items-center gap-2 bg-pmh-yellow text-pmh-purple text-xs font-bold px-4 py-1.5 rounded-full mb-4">
+                <i class="fas fa-star"></i> UPCOMING EVENT
+            </span>
+            <h2 class="text-2xl lg:text-3xl font-bold mb-3"><?= h($upcomingProgramsList[0]->name) ?></h2>
+            <div class="flex flex-wrap gap-4 text-purple-200">
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-calendar-alt text-pmh-yellow"></i>
+                    <?= $upcomingProgramsList[0]->date->format('d F Y') ?>
+                </span>
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-map-marker-alt text-pmh-yellow"></i>
+                    <?= h($upcomingProgramsList[0]->venue) ?>
+                </span>
+            </div>
         </div>
+        <a href="<?= $this->Url->build(['controller' => 'Programs', 'action' => 'allprogram']) ?>" class="inline-flex items-center justify-center gap-2 bg-pmh-yellow text-pmh-purple px-8 py-4 rounded-xl font-bold hover:bg-white transition-all shadow-lg hover:shadow-xl whitespace-nowrap">
+            View All Programs <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+</div>
+<?php endif; ?>
+
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="font-bold text-gray-900">Monthly Programs</h3>
+                <p class="text-sm text-gray-500">2025 Program Distribution</p>
+            </div>
+            <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                <i class="fas fa-chart-bar text-pmh-purple"></i>
+            </div>
+        </div>
+        <div id="programChart" class="h-64"></div>
+    </div>
+
+    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="font-bold text-gray-900">Orders by Category</h3>
+                <p class="text-sm text-gray-500">Product distribution</p>
+            </div>
+            <div class="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
+                <i class="fas fa-chart-pie text-pmh-yellow"></i>
+            </div>
+        </div>
+        <div id="orderChart" class="h-64"></div>
     </div>
 </div>
 
-<div class="bg-pmh-purple rounded-2xl p-8 text-white shadow-lg text-center">
-    <h3 class="text-2xl font-bold mb-4">Quick Actions</h3>
-    <div class="flex flex-wrap justify-center gap-4">
-        <a href="<?= $this->Url->build(['controller' => 'Products', 'action' => 'listmerchandise']) ?>" class="px-8 py-3 bg-pmh-yellow text-pmh-purple font-bold rounded-xl hover:bg-white transition-all">Shop Merchandise</a>
-        <a href="<?= $this->Url->build(['controller' => 'Programs', 'action' => 'allprogram']) ?>" class="px-8 py-3 bg-white text-pmh-purple font-bold rounded-xl hover:bg-pmh-yellow transition-all">View All Programs</a>
-        <a href="<?= $this->Url->build(['controller' => 'Pages', 'action' => 'display', 'aboutus']) ?>" class="px-8 py-3 border-2 border-white text-white font-bold rounded-xl hover:bg-white hover:text-pmh-purple transition-all">History of PMH</a>
+<!-- Quick Actions -->
+<div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+    <h3 class="font-bold text-gray-900 mb-6">Quick Actions</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <a href="<?= $this->Url->build(['controller' => 'Products', 'action' => 'listmerchandise']) ?>" class="group flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:border-pmh-purple hover:bg-purple-50 transition-all">
+            <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-pmh-purple group-hover:shadow-lg transition-all">
+                <i class="fas fa-shopping-bag text-pmh-purple group-hover:text-white transition-colors"></i>
+            </div>
+            <div>
+                <p class="font-semibold text-gray-900">Merchandise</p>
+                <p class="text-sm text-gray-500">Shop products</p>
+            </div>
+        </a>
+
+        <a href="<?= $this->Url->build(['controller' => 'Programs', 'action' => 'allprogram']) ?>" class="group flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:border-pmh-yellow hover:bg-yellow-50 transition-all">
+            <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center group-hover:bg-pmh-yellow group-hover:shadow-lg transition-all">
+                <i class="fas fa-calendar-alt text-pmh-yellow group-hover:text-pmh-purple transition-colors"></i>
+            </div>
+            <div>
+                <p class="font-semibold text-gray-900">Programs</p>
+                <p class="text-sm text-gray-500">View events</p>
+            </div>
+        </a>
+
+        <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'profile']) ?>" class="group flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:border-pmh-purple hover:bg-purple-50 transition-all">
+            <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-pmh-purple group-hover:shadow-lg transition-all">
+                <i class="fas fa-user-circle text-pmh-purple group-hover:text-white transition-colors"></i>
+            </div>
+            <div>
+                <p class="font-semibold text-gray-900">My Profile</p>
+                <p class="text-sm text-gray-500">Edit details</p>
+            </div>
+        </a>
+
+        <a href="<?= $this->Url->build(['controller' => 'Pages', 'action' => 'display', 'aboutus']) ?>" class="group flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:border-gray-300 hover:bg-gray-50 transition-all">
+            <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center group-hover:bg-gray-900 group-hover:shadow-lg transition-all">
+                <i class="fas fa-info-circle text-gray-600 group-hover:text-white transition-colors"></i>
+            </div>
+            <div>
+                <p class="font-semibold text-gray-900">About PMH</p>
+                <p class="text-sm text-gray-500">Learn more</p>
+            </div>
+        </a>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- ApexCharts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-    // Program Bar Chart
-    const ctxProgram = document.getElementById('programChart').getContext('2d');
-    new Chart(ctxProgram, {
-        type: 'bar',
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            datasets: [{
-                label: 'Total Programs',
-                data: [2, 3, 1, 5, 2, 4, 1, 0, 3, 4, 2, 3], // These would eventually come from the database
-                backgroundColor: '#7c2a7c',
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true } }
-        }
-    });
+    const monthlyProgramData = <?= json_encode($monthlyPrograms) ?>;
+    const categoryLabels = <?= json_encode($categoryLabels) ?>;
+    const categoryData = <?= json_encode($categoryData) ?>;
 
-    // Order Pie Chart
-    const ctxOrder = document.getElementById('orderChart').getContext('2d');
-    new Chart(ctxOrder, {
-        type: 'doughnut',
-        data: {
-            labels: ['Ivory Tshirt', 'Raven Tshirt', 'Tote Bags', 'Badges'],
-            datasets: [{
-                data: [15, 20, 10, 5],
-                backgroundColor: ['#7c2a7c', '#edd134', '#000000', '#f3f4f6'],
-                borderColor: '#ffffff',
-                borderWidth: 2
-            }]
+    new ApexCharts(document.querySelector("#programChart"), {
+        series: [{ name: 'Programs', data: monthlyProgramData }],
+        chart: { type: 'bar', height: 250, toolbar: { show: false }, fontFamily: 'Inter, sans-serif' },
+        plotOptions: { bar: { borderRadius: 8, columnWidth: '50%' } },
+        colors: ['#7c2a7c'],
+        dataLabels: { enabled: false },
+        xaxis: {
+            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            labels: { style: { colors: '#9ca3af', fontSize: '11px' } },
+            axisBorder: { show: false }, axisTicks: { show: false }
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } }
-        }
-    });
+        yaxis: { labels: { style: { colors: '#9ca3af' } } },
+        grid: { borderColor: '#f3f4f6', strokeDashArray: 4 },
+        tooltip: { theme: 'light' }
+    }).render();
+
+    new ApexCharts(document.querySelector("#orderChart"), {
+        series: categoryData.length > 0 ? categoryData : [1],
+        chart: { type: 'donut', height: 250, fontFamily: 'Inter, sans-serif' },
+        labels: categoryLabels.length > 0 ? categoryLabels : ['No orders'],
+        colors: ['#7c2a7c', '#edd134', '#000000', '#9333ea', '#a855f7'],
+        plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: 'Total', fontSize: '12px' } } } } },
+        legend: { position: 'bottom', fontSize: '12px' },
+        dataLabels: { enabled: false },
+        tooltip: { theme: 'light' }
+    }).render();
 </script>
