@@ -11,12 +11,12 @@ class UsersController extends AppController
     {
         parent::beforeFilter($event);
         
-        // Allow public access to login and register
-        $this->Authentication->addUnauthenticatedActions(['login', 'register']);
+        // Allow public access to login, register, and password reset flow
+        $this->Authentication->addUnauthenticatedActions(['login', 'register', 'forgotPassword', 'resetPassword']);
         
         // Fix for 'Unexpected field role' error: Unlock the action
         if (isset($this->Security)) {
-            $this->Security->setConfig('unlockedActions', ['login', 'register']);
+            $this->Security->setConfig('unlockedActions', ['login', 'register', 'forgotPassword', 'resetPassword']);
         }
     }
 
@@ -80,8 +80,18 @@ class UsersController extends AppController
         $user = $this->Users->get($identity->get('id'));
         
         if ($this->request->is(['post', 'put'])) {
-            $user = $this->Users->patchEntity($user, $this->request->getData(), [
-                'fields' => ['full_name', 'email', 'phone_no']
+            $data = $this->request->getData();
+            $fields = ['full_name', 'email', 'phone_no'];
+            
+            // Only patch password if it's not empty
+            if (!empty($data['password'])) {
+                $fields[] = 'password';
+            } else {
+                unset($data['password']);
+            }
+
+            $user = $this->Users->patchEntity($user, $data, [
+                'fields' => $fields
             ]);
             
             if ($this->Users->save($user)) {
@@ -89,6 +99,72 @@ class UsersController extends AppController
                 return $this->redirect(['action' => 'profile']);
             }
             $this->Flash->error(__('Could not update profile. Please try again.'));
+        }
+        
+        $this->set(compact('user'));
+    }
+    public function forgotPassword()
+    {
+        $this->viewBuilder()->setLayout('ajax');
+        
+        if ($this->request->is('post')) {
+            $data = $this->request->getData();
+            $user = $this->Users->find()
+                ->where([
+                    'matric_no' => $data['matric_no'],
+                    'email' => $data['email']
+                ])
+                ->first();
+
+            if ($user) {
+                // In a real app, send email with token. Here using session for simplicity as requested.
+                $this->request->getSession()->write('ResetPassword.userId', $user->id);
+                return $this->redirect(['action' => 'resetPassword']);
+            }
+            $this->Flash->error(__('Invalid Matric Number or Email Address.'));
+        }
+    }
+
+    public function resetPassword()
+    {
+        $this->viewBuilder()->setLayout('ajax');
+        
+        $userId = $this->request->getSession()->read('ResetPassword.userId');
+        if (!$userId) {
+            return $this->redirect(['action' => 'login']);
+        }
+
+        $user = $this->Users->get($userId);
+        $user->password = ''; // Clear password so hash doesn't show in the form
+        
+        if ($this->request->is(['post', 'put'])) {
+            // Use the specific validation method we fixed in UsersTable
+            $user = $this->Users->patchEntity($user, $this->request->getData(), [
+                'validate' => 'resetPassword'
+            ]);
+            
+            if (!$user->hasErrors() && $this->Users->save($user)) {
+                $this->request->getSession()->delete('ResetPassword');
+                $this->Flash->success(__('Password has been reset successfully. Please login.'));
+                return $this->redirect(['action' => 'login']);
+            }
+            
+            // Debug: Capture all errors (validation + rules)
+            $errorMsg = 'Validation failed.';
+            if ($user->hasErrors()) {
+                $errors = [];
+                foreach ($user->getErrors() as $field => $rules) {
+                    if (is_array($rules)) {
+                        foreach ($rules as $rule => $message) {
+                            $errors[] = "$field: $message";
+                        }
+                    } else {
+                         $errors[] = "$field: $rules";
+                    }
+                }
+                $errorMsg = implode('<br>', $errors);
+            }
+            $this->Flash->error(__('Could not reset password.<br>' . $errorMsg), ['escape' => false]);
         }
         
         $this->set(compact('user'));

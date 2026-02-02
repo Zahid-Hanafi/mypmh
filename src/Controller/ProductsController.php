@@ -3,8 +3,19 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\Event\EventInterface;
+
 class ProductsController extends AppController
 {
+    public function beforeFilter(EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        
+        if ($this->components()->has('Security')) {
+            $this->Security->setConfig('unlockedActions', ['updateStatus']);
+        }
+    }
+
     /**
      * @var \App\Model\Table\OrdersTable
      */
@@ -29,8 +40,11 @@ class ProductsController extends AppController
 
         $products = $query->all();
 
-        // Load logged-in student identity
-        $userId = $this->Authentication->getIdentity()->id;
+        // Load logged-in user identity
+        $identity = $this->Authentication->getIdentity();
+        $userId = $identity->get('id');
+        $isAdmin = $identity->get('role') === 'admin';
+        
         $this->loadModel('Orders');
         
         // Fetch orders for this student so they appear in the history section
@@ -40,6 +54,36 @@ class ProductsController extends AppController
             ->order(['Orders.id' => 'DESC'])
             ->all();
 
-        $this->set(compact('products', 'myOrders'));
+        $this->set(compact('products', 'myOrders', 'isAdmin'));
+    }
+
+    public function updateStatus($id = null)
+    {
+        $this->request->allowMethod(['post', 'put']);
+        
+        // Security: specific admin check
+        $identity = $this->Authentication->getIdentity();
+        if (!$identity || $identity->get('role') !== 'admin') {
+            $this->Flash->error(__('You do not have permission to perform this action.'));
+            return $this->redirect(['action' => 'listmerchandise']);
+        }
+
+        // Fix: Get ID from POST data if not provided in URL
+        if (!$id) {
+            $id = $this->request->getData('id');
+        }
+
+        $product = $this->Products->get($id);
+        
+        // Patch with new status
+        $product = $this->Products->patchEntity($product, $this->request->getData());
+        
+        if ($this->Products->save($product)) {
+            $this->Flash->success(__('The product status has been updated.'));
+        } else {
+            $this->Flash->error(__('The product status could not be updated. Please, try again.'));
+        }
+
+        return $this->redirect(['action' => 'listmerchandise']);
     }
 }

@@ -40,7 +40,7 @@
         </p>
         <div class="bg-gradient-to-r from-purple-50 to-yellow-50 p-4 rounded-xl border border-purple-100">
             <p class="text-sm font-semibold text-gray-700 mb-2">📥 Download Profile</p>
-            <a href="#" class="inline-flex items-center gap-2 text-pmh-purple font-semibold hover:underline">
+            <a href="<?= $this->Url->build('/img/uitm.pdf') ?>" target="_blank" class="inline-flex items-center gap-2 text-pmh-purple font-semibold hover:underline">
                 <i class="fas fa-file-pdf"></i> PMH Official Profile 2025.pdf
             </a>
         </div>

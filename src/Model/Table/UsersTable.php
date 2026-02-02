@@ -72,9 +72,13 @@ class UsersTable extends Table
 
         $validator
             ->scalar('matric_no')
-            ->maxLength('matric_no', 20)
+            ->lengthBetween('matric_no', [10, 10], 'Matric number must be exactly 10 digits')
             ->requirePresence('matric_no', 'create')
             ->notEmptyString('matric_no')
+            ->add('matric_no', 'numeric', [
+                'rule' => ['custom', '/^[0-9]{10}$/'],
+                'message' => 'Matric number must contain exactly 10 digits'
+            ])
             ->add('matric_no', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
         $validator
@@ -133,6 +137,54 @@ class UsersTable extends Table
         $validator
             ->dateTime('modified_at')
             ->allowEmptyDateTime('modified_at');
+
+        return $validator;
+    }
+
+    /**
+     * Validation rules for password reset
+     *
+     * @param \Cake\Validation\Validator $validator Validator instance.
+     * @return \Cake\Validation\Validator
+     */
+    public function validationResetPassword(Validator $validator): Validator
+    {
+        $validator
+            ->scalar('password')
+            ->maxLength('password', 255)
+            ->requirePresence('password')
+            ->notEmptyString('password')
+            ->add('password', 'minLength', [
+                'rule' => ['minLength', 8],
+                'message' => 'Password must be at least 8 characters long'
+            ])
+            ->add('password', 'hasUppercase', [
+                'rule' => function ($value) {
+                    return (bool)preg_match('/[A-Z]/', $value);
+                },
+                'message' => 'Password must contain at least 1 uppercase letter'
+            ])
+            ->add('password', 'hasNumber', [
+                'rule' => function ($value) {
+                    return (bool)preg_match('/[0-9]/', $value);
+                },
+                'message' => 'Password must contain at least 1 number'
+            ])
+            ->add('password', 'hasSymbol', [
+                'rule' => function ($value) {
+                    return (bool)preg_match('/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/', $value);
+                },
+                'message' => 'Password must contain at least 1 symbol (!@#$%^&*() etc.)'
+            ]);
+
+        $validator
+            ->scalar('confirm_password')
+            ->requirePresence('confirm_password')
+            ->notEmptyString('confirm_password')
+            ->add('confirm_password', 'compareWith', [
+                'rule' => ['compareWith', 'password'],
+                'message' => 'Passwords do not match'
+            ]);
 
         return $validator;
     }

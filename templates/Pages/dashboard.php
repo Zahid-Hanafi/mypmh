@@ -228,7 +228,7 @@ $upcomingProgramsList = $upcomingProgramsList ?? [];
         series: categoryData.length > 0 ? categoryData : [1],
         chart: { type: 'donut', height: 250, fontFamily: 'Inter, sans-serif' },
         labels: categoryLabels.length > 0 ? categoryLabels : ['No orders'],
-        colors: ['#7c2a7c', '#edd134', '#000000', '#9333ea', '#a855f7'],
+        colors: ['#7c2a7c', '#edd134', '#a855f7', '#ffea60', '#9333ea', '#ffdd00'],
         plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: 'Total', fontSize: '12px' } } } } },
         legend: { position: 'bottom', fontSize: '12px' },
         dataLabels: { enabled: false },

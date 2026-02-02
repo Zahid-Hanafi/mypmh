@@ -9,26 +9,35 @@
     </a>
 </div>
 
-<!-- Search -->
+<!-- Filter Section -->
 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-8">
-    <form method="get" class="flex flex-col sm:flex-row gap-4">
-        <div class="relative flex-grow">
-            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-            <input type="text" name="search" placeholder="Search products..." 
-                value="<?= h($this->request->getQuery('search')) ?>"
-                class="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pmh-purple focus:border-pmh-purple transition-all outline-none">
+    <div class="flex flex-col md:flex-row items-end gap-4">
+        <div class="w-full md:flex-grow">
+            <label for="categoryFilter" class="block text-sm font-bold text-gray-700 mb-2">Filter by Category</label>
+            <div class="relative">
+                <i class="fas fa-filter absolute left-4 top-1/2 -translate-y-1/2 text-pmh-purple"></i>
+                <select id="categoryFilter" onchange="filterProducts()" class="w-full pl-12 pr-10 py-3 border border-gray-200 rounded-xl appearance-none focus:ring-2 focus:ring-pmh-purple focus:border-pmh-purple transition-all outline-none bg-white cursor-pointer">
+                    <option value="all">Show All Categories</option>
+                    <?php 
+                    $category_options = ['New Arrival', 'T-Shirt Ivory Edition', 'T-Shirt Raven Edition', 'Tote Bags', 'Badges Ivory Edition', 'Badges Raven Edition'];
+                    foreach ($category_options as $opt): ?>
+                        <option value="<?= h($opt) ?>"><?= h($opt) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+            </div>
         </div>
-        <button type="submit" class="bg-gradient-to-r from-pmh-purple to-pmh-purple-dark text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-200 transition-all">
-            Search
+        <button onclick="resetFilter()" class="w-full md:w-auto px-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-colors">
+            <i class="fas fa-undo mr-2"></i> Reset
         </button>
-    </form>
+    </div>
 </div>
 
 <?php 
 $category_list = ['New Arrival', 'T-Shirt Ivory Edition', 'T-Shirt Raven Edition', 'Tote Bags', 'Badges Ivory Edition', 'Badges Raven Edition'];
 foreach ($category_list as $current_cat): 
 ?>
-<div class="mb-12">
+<div class="mb-12 category-section transition-all duration-300" data-category="<?= h($current_cat) ?>">
     <div class="flex items-center gap-3 mb-6">
         <div class="w-2 h-8 bg-gradient-to-b from-pmh-purple to-pmh-purple-dark rounded-full"></div>
         <h2 class="text-xl font-bold text-gray-900"><?= $current_cat ?></h2>
@@ -37,24 +46,52 @@ foreach ($category_list as $current_cat):
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <?php foreach ($products as $product): ?>
             <?php if (trim($product->category) === $current_cat): ?>
-            <div class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:border-pmh-purple/30 transition-all">
+            <!-- Product Card -->
+            <div class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:border-pmh-purple/30 transition-all flex flex-col h-full">
                 <div class="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4 relative overflow-hidden">
                     <?= $this->Html->image('products/' . h($product->image), ['class' => 'max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-300']) ?>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
-                        <button onclick="openOrderModal('<?= $product->id ?>', '<?= h(addslashes($product->name)) ?>', '<?= $product->price ?>')" 
-                            class="bg-pmh-yellow text-pmh-purple font-bold px-4 py-2 rounded-lg text-sm">
-                            Quick Order
-                        </button>
-                    </div>
+                    <?php if ($product->status === 'closed'): ?>
+                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <span class="bg-red-500 text-white font-bold px-4 py-2 rounded-lg text-sm shadow-lg rotate-12">
+                                Unavailable
+                            </span>
+                        </div>
+                    <?php else: ?>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
+                            <button onclick="openOrderModal('<?= $product->id ?>', '<?= h(addslashes($product->name)) ?>', '<?= $product->price ?>')" 
+                                class="bg-pmh-yellow text-pmh-purple font-bold px-4 py-2 rounded-lg text-sm hover:bg-white transition-colors shadow-lg">
+                                Quick Order
+                            </button>
+                        </div>
+                    <?php endif; ?>
                 </div>
-                <div class="p-4">
-                    <h3 class="font-semibold text-gray-900 text-sm mb-1 line-clamp-2"><?= h($product->name) ?></h3>
-                    <div class="flex items-center justify-between mt-2">
+                <div class="p-4 flex flex-col flex-grow">
+                    <h3 class="font-semibold text-gray-900 text-sm mb-1 line-clamp-2 min-h-[40px]"><?= h($product->name) ?></h3>
+                    <div class="flex items-center justify-between mt-auto pt-2">
                         <p class="text-pmh-purple font-bold text-lg">RM <?= number_format($product->price, 2) ?></p>
-                        <button onclick="openOrderModal('<?= $product->id ?>', '<?= h(addslashes($product->name)) ?>', '<?= $product->price ?>')" 
-                            class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center text-pmh-purple hover:bg-pmh-purple hover:text-white transition-all">
-                            <i class="fas fa-cart-plus"></i>
-                        </button>
+                        
+                        <div class="flex items-center gap-2">
+                            <!-- Admin Edit Status Button -->
+                            <?php if (isset($isAdmin) && $isAdmin): ?>
+                                <button onclick="openStatusModal('<?= $product->id ?>', '<?= h($product->status ?? 'open') ?>')" 
+                                    class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-all shadow-sm" title="Edit Status">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                            <?php endif; ?>
+
+                            <?php if (!isset($isAdmin) || !$isAdmin): ?>
+                                <?php if ($product->status === 'closed'): ?>
+                                    <button disabled class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-400 cursor-not-allowed" title="Unavailable">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                <?php else: ?>
+                                    <button onclick="openOrderModal('<?= $product->id ?>', '<?= h(addslashes($product->name)) ?>', '<?= $product->price ?>')" 
+                                        class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-pmh-purple hover:bg-pmh-purple hover:text-white transition-all shadow-sm">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -64,14 +101,14 @@ foreach ($category_list as $current_cat):
 </div>
 <?php endforeach; ?>
 
-<!-- My Orders -->
-<div id="my-orders" class="pt-8">
+<!-- My OrdersHeader -->
+<div id="my-orders" class="pt-8 scroll-mt-24">
     <div class="flex items-center gap-3 mb-6">
         <div class="w-2 h-8 bg-gradient-to-b from-pmh-yellow to-yellow-400 rounded-full"></div>
         <h2 class="text-xl font-bold text-gray-900">My Purchase History</h2>
     </div>
     
-    <!-- Mobile Cards -->
+    <!-- Mobile Cards (Enhanced with Actions) -->
     <div class="space-y-4 lg:hidden">
         <?php if ($myOrders->isEmpty()): ?>
             <div class="bg-white rounded-2xl border border-gray-100 p-10 text-center">
@@ -80,19 +117,43 @@ foreach ($category_list as $current_cat):
             </div>
         <?php else: ?>
             <?php foreach ($myOrders as $order): ?>
-            <div class="bg-white rounded-2xl border border-gray-100 p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <h4 class="font-bold text-gray-900"><?= h($order->product->name) ?></h4>
-                    <?php 
-                    $statusClass = 'bg-gray-100 text-gray-600';
-                    if ($order->status === 'pending') $statusClass = 'bg-yellow-100 text-yellow-700';
-                    if ($order->status === 'complete') $statusClass = 'bg-green-100 text-green-700';
-                    ?>
-                    <span class="text-xs font-bold px-2 py-1 rounded-lg <?= $statusClass ?>"><?= ucfirst($order->status) ?></span>
+            <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm relative overflow-hidden">
+                <!-- Status Badge Absolute Top Right -->
+                <?php 
+                $statusClass = 'bg-gray-100 text-gray-600';
+                if ($order->status === 'pending') $statusClass = 'bg-yellow-100 text-yellow-700';
+                if ($order->status === 'complete') $statusClass = 'bg-green-100 text-green-700';
+                ?>
+                <div class="flex justify-between items-start mb-3">
+                    <h4 class="font-bold text-gray-900 pr-16 leading-tight"><?= h($order->product->name) ?></h4>
+                    <span class="absolute top-5 right-5 text-[10px] font-bold px-2 py-1 rounded-lg <?= $statusClass ?>"><?= ucfirst($order->status) ?></span>
                 </div>
-                <div class="flex items-center justify-between text-sm text-gray-500">
-                    <span>Size: <?= h($order->size ?: '-') ?> | Qty: <?= $order->quantity ?></span>
-                    <span class="font-bold text-pmh-purple">RM <?= number_format((float)$order->total_price, 2) ?></span>
+                
+                <div class="flex items-center justify-between text-sm text-gray-500 mb-4 bg-gray-50 p-3 rounded-xl">
+                    <div class="flex flex-col">
+                        <span class="text-xs text-gray-400 uppercase tracking-wider">Size</span>
+                        <span class="font-bold text-gray-700"><?= h($order->size ?: '-') ?></span>
+                    </div>
+                    <div class="flex flex-col text-center">
+                        <span class="text-xs text-gray-400 uppercase tracking-wider">Qty</span>
+                        <span class="font-bold text-gray-700"><?= $order->quantity ?></span>
+                    </div>
+                    <div class="flex flex-col text-right">
+                        <span class="text-xs text-gray-400 uppercase tracking-wider">Total</span>
+                        <span class="font-bold text-pmh-purple">RM <?= number_format((float)$order->total_price, 2) ?></span>
+                    </div>
+                </div>
+
+                <!-- Actions Grid -->
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="<?= $this->Url->build(['controller' => 'Orders', 'action' => 'viewReceipt', $order->id]) ?>" target="_blank" 
+                       class="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-purple-50 text-pmh-purple font-bold text-sm hover:bg-pmh-purple hover:text-white transition-all">
+                        <i class="fas fa-file-pdf"></i> Receipt
+                    </a>
+                    <?= $this->Form->postLink('<i class="fas fa-trash-alt mr-2"></i> Cancel', 
+                        ['controller' => 'Orders', 'action' => 'delete', $order->id], 
+                        ['escape' => false, 'confirm' => __('Cancel order?'), 'class' => 'flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-50 text-red-500 font-bold text-sm hover:bg-red-500 hover:text-white transition-all']) 
+                    ?>
                 </div>
             </div>
             <?php endforeach; ?>
@@ -188,7 +249,116 @@ foreach ($category_list as $current_cat):
     </div>
 </div>
 
+<!-- Scroll to Top Button -->
+<button id="scrollTopBtn" onclick="scrollToTop()" class="fixed bottom-6 right-6 w-12 h-12 bg-pmh-purple text-white rounded-full shadow-lg hover:bg-pmh-purple-dark transition-all opacity-0 invisible z-40 flex items-center justify-center">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<!-- Edit Status Modal -->
+<div id="statusModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden transform scale-95 opacity-0 transition-all" id="statusModalContent">
+        <div class="bg-gray-50 border-b border-gray-100 p-5">
+            <h3 class="text-lg font-bold text-gray-800">Edit Product Status</h3>
+        </div>
+        <?= $this->Form->create(null, ['url' => ['controller' => 'Products', 'action' => 'updateStatus'], 'id' => 'statusForm', 'class' => 'p-6']) ?>
+            <input type="hidden" name="id" id="statusProductId">
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Availability Status</label>
+                <select name="status" id="statusSelect" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pmh-purple outline-none">
+                    <option value="open">Open (Available)</option>
+                    <option value="closed">Closed (Unavailable)</option>
+                </select>
+            </div>
+            
+            <div class="flex gap-3">
+                <button type="button" onclick="closeStatusModal()" class="flex-1 px-4 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-all">Cancel</button>
+                <button type="button" onclick="openConfirmModal()" class="flex-1 px-4 py-3 bg-pmh-purple text-white font-bold rounded-xl hover:bg-pmh-purple-dark transition-all">Change Now</button>
+            </div>
+        <?= $this->Form->end() ?>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[60] p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 text-center transform scale-95 opacity-0 transition-all" id="confirmModalContent">
+        <div class="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Are you sure?</h3>
+        <p class="text-gray-500 mb-6">You are about to change the status of this product. Users may not be able to order it if it is closed.</p>
+        
+        <div class="flex gap-3">
+            <button onclick="closeConfirmModal()" class="flex-1 px-4 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-all">Cancel</button>
+            <button onclick="submitStatusForm()" class="flex-1 px-4 py-3 bg-pmh-purple text-white font-bold rounded-xl hover:bg-pmh-purple-dark transition-all">Yes, Change It</button>
+        </div>
+    </div>
+</div>
+
 <script>
+// Status Modal Logic
+function openStatusModal(id, currentStatus) {
+    document.getElementById('statusProductId').value = id;
+    document.getElementById('statusSelect').value = currentStatus;
+    
+    document.getElementById('statusModal').classList.remove('hidden');
+    document.getElementById('statusModal').classList.add('flex');
+    setTimeout(() => {
+        document.getElementById('statusModalContent').classList.remove('scale-95', 'opacity-0');
+        document.getElementById('statusModalContent').classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function closeStatusModal() {
+    document.getElementById('statusModalContent').classList.add('scale-95', 'opacity-0');
+    setTimeout(() => {
+        document.getElementById('statusModal').classList.add('hidden');
+        document.getElementById('statusModal').classList.remove('flex');
+    }, 200);
+}
+
+function openConfirmModal() {
+    document.getElementById('confirmModal').classList.remove('hidden');
+    document.getElementById('confirmModal').classList.add('flex');
+    setTimeout(() => {
+        document.getElementById('confirmModalContent').classList.remove('scale-95', 'opacity-0');
+        document.getElementById('confirmModalContent').classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function closeConfirmModal() {
+    document.getElementById('confirmModalContent').classList.add('scale-95', 'opacity-0');
+    setTimeout(() => {
+        document.getElementById('confirmModal').classList.add('hidden');
+        document.getElementById('confirmModal').classList.remove('flex');
+    }, 200);
+}
+
+function submitStatusForm() {
+    document.getElementById('statusForm').submit();
+}
+
+// Filter Logic
+function filterProducts() {
+    const selected = document.getElementById('categoryFilter').value;
+    const sections = document.querySelectorAll('.category-section');
+    
+    sections.forEach(section => {
+        if (selected === 'all' || section.getAttribute('data-category') === selected) {
+            section.classList.remove('hidden');
+            section.classList.add('block');
+        } else {
+            section.classList.add('hidden');
+            section.classList.remove('block');
+        }
+    });
+}
+
+function resetFilter() {
+    document.getElementById('categoryFilter').value = 'all';
+    filterProducts();
+}
+
+// Order Modal Logic
 function openOrderModal(id, name, price) {
     document.getElementById('modalProductId').value = id;
     document.getElementById('modalProductName').innerText = name;
@@ -216,5 +386,18 @@ function closeOrderModal() {
         document.getElementById('orderModal').classList.add('hidden');
         document.getElementById('orderModal').classList.remove('flex');
     }, 200);
+}
+
+// Scroll To Top
+const scrollTopBtn = document.getElementById('scrollTopBtn');
+window.addEventListener('scroll', () => {
+    if (window.pageYOffset > 300) {
+        scrollTopBtn.classList.remove('opacity-0', 'invisible');
+    } else {
+        scrollTopBtn.classList.add('opacity-0', 'invisible');
+    }
+});
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>

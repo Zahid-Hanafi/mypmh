@@ -163,6 +163,11 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="flex justify-end mt-2">
+                             <a href="<?= $this->Url->build(['action' => 'forgotPassword']) ?>" class="text-sm font-medium text-pmh-purple hover:text-pmh-purple-dark hover:underline">
+                                Forgot Password?
+                            </a>
+                        </div>
 
                         <!-- Submit Button -->
                         <button type="submit" class="w-full py-4 bg-gradient-to-r from-pmh-purple to-pmh-purple-dark text-white font-bold rounded-xl hover:shadow-lg hover:shadow-purple-300 transition-all transform hover:scale-[1.02] text-lg">

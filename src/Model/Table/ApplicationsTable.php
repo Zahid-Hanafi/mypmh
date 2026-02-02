@@ -12,6 +12,7 @@ use Cake\Validation\Validator;
  * Applications Model
  *
  * @property \App\Model\Table\UsersTable&\Cake\ORM\Association\BelongsTo $Users
+ * @property \App\Model\Table\InterviewSlotsTable&\Cake\ORM\Association\BelongsTo $InterviewSlots
  *
  * @method \App\Model\Entity\Application newEmptyEntity()
  * @method \App\Model\Entity\Application newEntity(array $data, array $options = [])
@@ -22,10 +23,6 @@ use Cake\Validation\Validator;
  * @method \App\Model\Entity\Application[] patchEntities(iterable $entities, array $data, array $options = [])
  * @method \App\Model\Entity\Application|false save(\Cake\Datasource\EntityInterface $entity, $options = [])
  * @method \App\Model\Entity\Application saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \App\Model\Entity\Application[]|\Cake\Datasource\ResultSetInterface|false saveMany(iterable $entities, $options = [])
- * @method \App\Model\Entity\Application[]|\Cake\Datasource\ResultSetInterface saveManyOrFail(iterable $entities, $options = [])
- * @method \App\Model\Entity\Application[]|\Cake\Datasource\ResultSetInterface|false deleteMany(iterable $entities, $options = [])
- * @method \App\Model\Entity\Application[]|\Cake\Datasource\ResultSetInterface deleteManyOrFail(iterable $entities, $options = [])
  */
 class ApplicationsTable extends Table
 {
@@ -47,6 +44,11 @@ class ApplicationsTable extends Table
             'foreignKey' => 'user_id',
             'joinType' => 'INNER',
         ]);
+
+        $this->belongsTo('InterviewSlots', [
+            'foreignKey' => 'interview_slot_id',
+            'joinType' => 'LEFT',
+        ]);
     }
 
     /**
@@ -64,7 +66,25 @@ class ApplicationsTable extends Table
         $validator
             ->decimal('cgpa')
             ->requirePresence('cgpa', 'create')
-            ->notEmptyString('cgpa');
+            ->notEmptyString('cgpa')
+            ->range('cgpa', [0, 4], 'CGPA must be between 0 and 4');
+
+        $validator
+            ->integer('semester')
+            ->requirePresence('semester', 'create')
+            ->notEmptyString('semester')
+            ->range('semester', [1, 4], 'Only semester 1-4 students can apply');
+
+        $validator
+            ->scalar('gender')
+            ->requirePresence('gender', 'create')
+            ->notEmptyString('gender')
+            ->inList('gender', ['Male', 'Female'], 'Please select a valid gender');
+
+        $validator
+            ->scalar('home_address')
+            ->requirePresence('home_address', 'create')
+            ->notEmptyString('home_address');
 
         $validator
             ->scalar('achievement')
@@ -72,8 +92,21 @@ class ApplicationsTable extends Table
             ->notEmptyString('achievement');
 
         $validator
+            ->scalar('relative_experience')
+            ->allowEmptyString('relative_experience');
+
+        $validator
+            ->integer('interview_slot_id')
+            ->requirePresence('interview_slot_id', 'create')
+            ->notEmptyString('interview_slot_id', 'Please select an interview slot');
+
+        $validator
             ->scalar('status')
             ->allowEmptyString('status');
+
+        $validator
+            ->scalar('rejection_reason')
+            ->allowEmptyString('rejection_reason');
 
         $validator
             ->dateTime('created_at')
@@ -96,7 +129,35 @@ class ApplicationsTable extends Table
     public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->existsIn('user_id', 'Users'), ['errorField' => 'user_id']);
+        $rules->add($rules->existsIn('interview_slot_id', 'InterviewSlots'), ['errorField' => 'interview_slot_id']);
 
         return $rules;
+    }
+
+    /**
+     * Custom finder to filter by gender
+     */
+    public function findByGender(Query $query, array $options): Query
+    {
+        if (!empty($options['gender'])) {
+            $query->where(['Applications.gender' => $options['gender']]);
+        }
+        return $query;
+    }
+
+    /**
+     * Custom finder to sort by CGPA (highest first)
+     */
+    public function findSortedByCgpa(Query $query, array $options): Query
+    {
+        return $query->order(['Applications.cgpa' => 'DESC']);
+    }
+
+    /**
+     * Custom finder to sort by semester
+     */
+    public function findSortedBySemester(Query $query, array $options): Query
+    {
+        return $query->order(['Applications.semester' => 'ASC']);
     }
 }

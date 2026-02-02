@@ -63,7 +63,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
                     return $handler->handle($request);
                 }
 
-                // Kecualikan DebugKit dari CSRF
+                // Exclude DebugKit from CSRF
                 if (strpos($request->getUri()->getPath(), '/debug-kit') !== false) {
                     return $handler->handle($request);
                 }

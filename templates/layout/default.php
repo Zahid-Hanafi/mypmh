@@ -113,9 +113,9 @@
                     <a href="<?= $this->Url->build(['controller' => 'Programs', 'action' => 'allprogram']) ?>" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-pmh-purple hover:bg-purple-50 rounded-lg transition-all">Programs</a>
                     <?php if ($isAdmin): ?>
                     <a href="<?= $this->Url->build(['controller' => 'Orders', 'action' => 'totalorder']) ?>" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-pmh-purple hover:bg-purple-50 rounded-lg transition-all">Orders</a>
-                    <?php else: ?>
-                    <a href="<?= $this->Url->build(['controller' => 'Products', 'action' => 'listmerchandise']) ?>" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-pmh-purple hover:bg-purple-50 rounded-lg transition-all">Merchandise</a>
+                    <a href="<?= $this->Url->build(['controller' => 'Applications', 'action' => 'adminIndex']) ?>" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-pmh-purple hover:bg-purple-50 rounded-lg transition-all">Applications</a>
                     <?php endif; ?>
+                    <a href="<?= $this->Url->build(['controller' => 'Products', 'action' => 'listmerchandise']) ?>" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-pmh-purple hover:bg-purple-50 rounded-lg transition-all">Merchandise</a>
                 </nav>
                 
                 <!-- Right: User Menu -->
@@ -233,6 +233,16 @@
                             <i class="fas fa-clipboard-list w-5"></i> Total Orders
                         </a>
                     </li>
+                    <li>
+                        <a href="<?= $this->Url->build(['controller' => 'Applications', 'action' => 'adminIndex']) ?>" class="nav-link flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-purple-50 hover:text-pmh-purple rounded-xl transition-all font-medium">
+                            <i class="fas fa-file-alt w-5"></i> Applications
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?= $this->Url->build(['controller' => 'Products', 'action' => 'listmerchandise']) ?>" class="nav-link flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-purple-50 hover:text-pmh-purple rounded-xl transition-all font-medium">
+                            <i class="fas fa-shopping-bag w-5"></i> Merchandise
+                        </a>
+                    </li>
                 <?php else: ?>
                     <li>
                         <a href="<?= $this->Url->build(['controller' => 'Products', 'action' => 'listmerchandise']) ?>" class="nav-link flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-purple-50 hover:text-pmh-purple rounded-xl transition-all font-medium">
@@ -312,13 +322,13 @@
                         Persatuan Mahasiswa Hadhari - Empowering UiTM students through excellence and integrity.
                     </p>
                     <div class="flex gap-3">
-                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-pmh-purple transition-all hover:scale-110">
+                        <a href="https://www.facebook.com/pmh.perdana" target="blank"class="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-pmh-purple transition-all hover:scale-110">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-pmh-purple transition-all hover:scale-110">
+                        <a href="https://www.instagram.com/pmhpp?igsh=eDY0cHB2dDV2cnp3" target="blank"class="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-pmh-purple transition-all hover:scale-110">
                             <i class="fab fa-instagram"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-pmh-purple transition-all hover:scale-110">
+                        <a href="https://www.tiktok.com/@pmhppuitm?_r=1&_t=ZS-93OZTX4euIh" target="blank"class="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-pmh-purple transition-all hover:scale-110">
                             <i class="fab fa-tiktok"></i>
                         </a>
                     </div>

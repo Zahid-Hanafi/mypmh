@@ -11,11 +11,9 @@ class ProgramsController extends AppController
     {
         parent::beforeFilter($event);
         
-        // Allow viewing programs for all authenticated users
-        // CRUD actions (add, edit, delete) require admin check in methods
-        
-        if ($this->components()->has('FormProtection')) {
-            $this->FormProtection->setConfig('unlockedActions', ['add', 'edit', 'delete']);
+        // Unlock CRUD actions from CSRF/Security checks
+        if ($this->components()->has('Security')) {
+            $this->Security->setConfig('unlockedActions', ['add', 'edit', 'delete']);
         }
     }
 
@@ -71,14 +69,20 @@ class ProgramsController extends AppController
     public function add()
     {
         $redirect = $this->requireAdmin();
-        if ($redirect) return $redirect;
+        if ($redirect) {
+            return $redirect;
+        }
 
         $program = $this->Programs->newEmptyEntity();
         
         if ($this->request->is('post')) {
             $program = $this->Programs->patchEntity($program, $this->request->getData());
             $program->created_by = $this->Authentication->getIdentity()->id;
-            $program->status = 'upcoming'; // Default status
+            
+            // Default to upcoming if not set
+            if (empty($program->status)) {
+                $program->status = 'upcoming';
+            }
             
             if ($this->Programs->save($program)) {
                 $this->Flash->success(__('Program has been created successfully!'));
@@ -96,7 +100,9 @@ class ProgramsController extends AppController
     public function edit($id = null)
     {
         $redirect = $this->requireAdmin();
-        if ($redirect) return $redirect;
+        if ($redirect) {
+            return $redirect;
+        }
 
         $program = $this->Programs->get($id);
         
@@ -119,7 +125,9 @@ class ProgramsController extends AppController
     public function delete($id = null)
     {
         $redirect = $this->requireAdmin();
-        if ($redirect) return $redirect;
+        if ($redirect) {
+            return $redirect;
+        }
 
         $this->request->allowMethod(['post', 'delete']);
         $program = $this->Programs->get($id);

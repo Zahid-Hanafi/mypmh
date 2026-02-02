@@ -14,6 +14,7 @@ class User extends Entity
         'email' => true,
         'phone_no' => true,
         'password' => true,
+        'confirm_password' => true,
         'role' => true,
         'status' => true,
         'created_at' => true,

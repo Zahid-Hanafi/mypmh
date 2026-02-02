@@ -122,6 +122,24 @@
                         'placeholder' => '01X-XXXXXXX'
                     ]) ?>
                 </div>
+                
+                <!-- New Password -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-lock text-pmh-purple mr-2"></i>New Password
+                    </label>
+                    <?= $this->Form->control('password', [
+                        'label' => false,
+                        'type' => 'password',
+                        'value' => '', 
+                        'required' => false,
+                        'class' => 'w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pmh-purple focus:border-pmh-purple transition-all outline-none',
+                        'placeholder' => 'Leave blank to keep current password'
+                    ]) ?>
+                    <p class="text-xs text-gray-500 mt-1 pl-1">
+                        <i class="fas fa-info-circle mr-1" ></i> Must contain at least 8 characters, 1 uppercase, 1 number, and 1 symbol.
+                    </p>
+                </div>
 
                 <!-- Matric No (Read-only) -->
                 <div>
@@ -145,25 +163,5 @@
             <?= $this->Form->end() ?>
         </div>
 
-        <!-- Security Section -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 lg:p-8 mt-6">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-shield-alt text-red-500"></i>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-gray-900">Security</h3>
-                    <p class="text-sm text-gray-500">Manage your account security</p>
-                </div>
-            </div>
-            <p class="text-gray-600 text-sm mb-4">
-                For security reasons, password changes must be requested through the administrator. 
-                Please contact support if you need to update your password.
-            </p>
-            <a href="<?= $this->Url->build(['controller' => 'Pages', 'action' => 'display', 'contactus']) ?>" 
-                class="inline-flex items-center gap-2 text-pmh-purple font-medium hover:underline">
-                <i class="fas fa-envelope"></i> Contact Support
-            </a>
-        </div>
     </div>
 </div>

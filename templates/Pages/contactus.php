@@ -64,14 +64,11 @@
                 <a href="#" class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-600 hover:bg-pmh-purple hover:text-white transition-all hover:scale-110">
                     <i class="fab fa-facebook-f text-xl"></i>
                 </a>
-                <a href="#" class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-600 hover:bg-gradient-to-br hover:from-pink-500 hover:to-yellow-500 hover:text-white transition-all hover:scale-110">
+                <a href="https://www.instagram.com/pmhpp?igsh=eDY0cHB2dDV2cnp3" target="blank" class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-600 hover:bg-gradient-to-br hover:from-pink-500 hover:to-yellow-500 hover:text-white transition-all hover:scale-110">
                     <i class="fab fa-instagram text-xl"></i>
                 </a>
                 <a href="#" class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-600 hover:bg-black hover:text-white transition-all hover:scale-110">
                     <i class="fab fa-tiktok text-xl"></i>
-                </a>
-                <a href="#" class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-600 hover:bg-green-500 hover:text-white transition-all hover:scale-110">
-                    <i class="fab fa-whatsapp text-xl"></i>
                 </a>
             </div>
         </div>
@@ -86,7 +83,7 @@
                 </h3>
             </div>
             <div class="h-[400px] lg:h-[calc(100%-60px)]">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3983.899387494493!2d101.48834617502!3d3.1212876968544837!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31cc52e12b771e7d%3A0xc6c766f6df6b158c!2sUiTM%20Kampus%20Puncak%20Perdana!5e0!3m2!1sen!2smy!4v1705000000000!5m2!1sen!2smy" 
+                <iframe src="https://maps.google.com/maps?q=3.132135,101.494072&t=&z=15&ie=UTF8&iwloc=&output=embed" 
                     width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </div>
