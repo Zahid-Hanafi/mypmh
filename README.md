@@ -1,10 +1,10 @@
-# MyPMH - Postgraduate Management Hub
+# MyPMH - Persatuan Mahasiswa Hadhari
 
 ![CakePHP](https://img.shields.io/badge/CakePHP-4.x-red?style=flat-square&logo=cakephp)
 ![PHP](https://img.shields.io/badge/PHP-8.0+-blue?style=flat-square&logo=php)
 ![MySQL](https://img.shields.io/badge/MySQL-Database-orange?style=flat-square&logo=mysql)
 
-**MyPMH (My Postgraduate Management Hub)** is a comprehensive web application for managing postgraduate student applications, programs, and administrative tasks. Built with CakePHP 4.x framework.
+**MyPMH (My Persatuan Mahasiswa Hadhari)** is a comprehensive web application for managing postgraduate student applications, programs, and administrative tasks. Built with CakePHP 4.x framework.
 
 ---
 
